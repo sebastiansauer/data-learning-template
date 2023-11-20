@@ -1,0 +1,131 @@
+---
+title: "Tidymodels template"
+author: "<Your name here>"
+---
+
+
+# Setup
+
+```{r}
+library(tidymodels)
+library(tidyverse)
+library(tictoc)  # measure computation time
+library(<other_package_you_might_need_for_modelling>)  # tidymodels uses existing packages for modelling so you need to make them available
+
+```
+
+
+
+# Data
+
+Import data:
+
+```{r}
+d_path <- "Enter data path here"
+d <- read_csv(d_path)
+```
+
+
+Split into train and test:
+
+```{r}
+set.seed(42)
+d_split <- initial_split(d)
+d_train <- training(d_split)
+d_test <- testing(d_split)
+```
+
+
+
+# Define model
+
+See [here](https://www.tidymodels.org/find/parsnip/) an overview of machine learning models supported by `{parsnip}`.
+
+```{r}
+mod1 <-
+  <enter_parsnip_model_name_here>(
+    mode = "<choose_regression_or_classification>",
+           cost_complexity = tune())
+```
+
+
+
+# Define Cross validation scheme
+
+```{r}
+set.seed(42)
+rsmpl <- vfold_cv(d_train)
+```
+
+
+
+# Define preprocessing (recipe)
+
+```{r}
+rec1 <- recipe(<enter_output_variable> ~  ., data = d_train)
+```
+
+
+
+# Define workflow
+
+```{r}
+wf1 <-
+  workflow() %>% 
+  add_model(mod1) %>% 
+  add_recipe(rec1)
+```
+
+
+
+# Tune and fit the workflow
+
+```{r}
+tic()
+wf1_fit <-
+  wf1 %>% 
+  tune_grid(
+    resamples = rsmpl)
+toc()
+```
+
+
+# Finalize workflow with best tuning parameter values
+
+best candidate:
+
+```{r}
+show_best(wf1_fit)
+```
+
+
+
+
+finalize wf:
+
+```{r}
+wf1_final <-
+  wf1 %>% 
+  finalize_workflow(select_best(wf1_fit))
+```
+
+
+Fit with best parameter values:
+
+```{r}
+wf1_fit_final <-
+  wf1_final %>% 
+  last_fit(d_split)
+```
+
+
+
+# Performance in test set
+
+```{r}
+# Modellgüte im Test-Set:
+collect_metrics(wf1_fit_final)
+```
+
+
+
