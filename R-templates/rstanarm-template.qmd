@@ -1,0 +1,79 @@
+---
+title: <Enter your title here>
+author: <Enter your name here>
+---
+
+
+# Setup
+
+
+```{r}
+#| message: false
+library(rstanarm)
+library(tidyverse)
+library(easystats)
+```
+
+
+
+# Data
+
+Here's a template on how to import data into RStudio:
+
+```{r}
+d <- read_csv("<Enter the path to your data here>")
+data("<dataset name", package = "<name of R package where the data reside>")
+```
+
+
+And here's a simple example:
+
+```{r}
+mtcars <- read_csv("https://vincentarelbundock.github.io/Rdatasets/csv/datasets/mtcars.csv")
+data("mtcars", package = "datasets")
+```
+
+
+# Bayes regression
+
+
+Compute the model:
+
+```{r}
+model1 <- stan_glm(mpg ~ hp,  # regression formula
+                   data = mtcars,  #  data set name
+                   refresh = 0,  # suppress junk output
+                   seed = 42  # reproducibility
+                   )
+```
+
+
+# Model results
+
+## Parameters
+
+Get the results (parameters):
+
+
+```{r}
+parameters(model1)
+```
+
+Plot the parameters:
+
+
+```{r}
+parameters(model1) |> plot()
+```
+
+
+## R squared
+
+
+```{r}
+r2(model1)
+```
+
+
+
+
